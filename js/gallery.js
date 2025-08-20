@@ -64,35 +64,42 @@ const images = [
   },
 ];
 
-document.addEventListener("DOMContentLoaded", () => {
-  const gallery = document.querySelector(".gallery");
-  const galleryMarkup = images
-    .map(
-      ({ preview, original, description }) => `
+const gallery = document.querySelector(".gallery");
+
+const galleryMarkup = images
+  .map(
+    ({ preview, original, description }) => `
 <li class="gallery-item">
   <a class="gallery-link" href="${original}">
     <img class="gallery-image" src="${preview}" data-source="${original}" alt="${description}" />
   </a>
 </li>`
-    )
-    .join("");
-  gallery.insertAdjacentHTML("beforeend", galleryMarkup);
+  )
+  .join("");
 
-  gallery.addEventListener("click", (event) => {
-    event.preventDefault();
-    const target = event.target;
-    if (target.nodeName !== "IMG") return;
-    const largeImageURL = target.dataset.source;
-    const instance = basicLightbox.create(
-      `<img src="${largeImageURL}" alt="${target.alt}" />`,
-      {
-        onShow: (instance) => {
-          instance.element().addEventListener("click", () => {
-            instance.close();
-          });
-        },
-      }
-    );
-    instance.show();
+gallery.innerHTML = galleryMarkup;
+
+gallery.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (event.target.nodeName !== "IMG") return;
+
+  const originalSrc = event.target.dataset.source;
+  const modal = document.createElement("div");
+  modal.classList.add("modal");
+
+  const img = document.createElement("img");
+  img.src = originalSrc;
+  img.alt = event.target.alt;
+
+  modal.appendChild(img);
+  document.body.appendChild(modal);
+
+  requestAnimationFrame(() => modal.classList.add("show"));
+
+  modal.addEventListener("click", () => {
+    modal.classList.remove("show");
+    modal.addEventListener("transitionend", () => modal.remove(), {
+      once: true,
+    });
   });
 });
