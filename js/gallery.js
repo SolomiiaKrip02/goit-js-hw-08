@@ -81,25 +81,14 @@ gallery.innerHTML = galleryMarkup;
 
 gallery.addEventListener("click", (event) => {
   event.preventDefault();
+
   if (event.target.nodeName !== "IMG") return;
 
   const originalSrc = event.target.dataset.source;
-  const modal = document.createElement("div");
-  modal.classList.add("modal");
 
-  const img = document.createElement("img");
-  img.src = originalSrc;
-  img.alt = event.target.alt;
+  const instance = basicLightbox.create(`
+    <img src="${originalSrc}" alt="${event.target.alt}" />
+  `);
 
-  modal.appendChild(img);
-  document.body.appendChild(modal);
-
-  requestAnimationFrame(() => modal.classList.add("show"));
-
-  modal.addEventListener("click", () => {
-    modal.classList.remove("show");
-    modal.addEventListener("transitionend", () => modal.remove(), {
-      once: true,
-    });
-  });
+  instance.show();
 });
